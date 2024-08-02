@@ -1,0 +1,96 @@
+{% extends "../base.html"%}
+{% block content %}
+
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-9">
+            {% if user == post.author %}
+            <a href="{% url 'post-update' post.id %}" class="btn btn-warning mb-2">
+                Update
+            </a>
+            <form method="POST" action="{% url 'post-delete' post.id%}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger mb-2">
+                    Delete
+                </button>
+            </form>
+            {% endif %}
+            <div class="card mb-3">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <img
+                            src="{{post.author.profile_picture.url}}"
+                            class="rounded-circle mr-3 image-fluid"
+                            style="height:50px; width:50px"
+                            alt="Profile Picture"
+                        />
+                        <div>
+                            <h5 class="card-title">{{post.author.username}}</h5>
+                            <p class="card-text">{{ post.date_created|timesince }}</p>ago
+                        </div>
+                    </div>
+                    <p class="card-text mt-3">
+                        {{ post.title }}
+                    </p>
+                    <p class="card-text">
+                        {{post.body}}
+                    </p>
+                </div>
+            </div>
+            {% if user.is_authenticated %}
+            <h4>Add a Comment</h4>
+            <form method="POST" action="{% url 'comment-create'%}">
+                {% csrf_token %}
+                <div class="form-group">
+                    <textarea
+                        class="form-control"
+                        rows="3"
+                        placeholder="Write your comment..."
+                        name="comment"
+                    ></textarea >
+                </div>
+                <input type="hidden" value="{{ post.id }}" name="post-id">
+                <button type="submit" class="btn btn-primary">
+                    Submit
+                </button>
+            </form>
+            {% else%}
+            Connect you<a href="{% url 'login'%}">Here</a>
+            {% endif %}
+        
+            <h4 class="mt-4">Comments</h4>
+            {% for comment in comment_list%}
+            <div class="card mb-3">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <img
+                            src="{{comment.author.profile_picture.url}}"
+                            class="rounded-circle mr-3 image-fluid"
+                            style="height:50px; width:50px"
+                            alt="Profile Picture"
+                        />
+                        <div>
+                            <h6 class="card-title">{{comment.author.username}}</h6>
+                            <p class="card-text text-muted">
+                                {{comment.date_created|timesince}} ago
+                            </p>
+                        </div>
+                    </div>
+                    <p class="card-text mt-3">
+                        {{comment.comment}}
+                    </p>
+                </div>
+            </div>
+            {% endfor %}
+
+
+            <!-- Add more comments here -->
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+{% endblock%}
